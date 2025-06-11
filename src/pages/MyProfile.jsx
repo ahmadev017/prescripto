@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { useState } from "react";
 import { assets } from "../assets/assets";
-import { AppContext } from "../Context/appContext";
+import { AppContext } from "../Context/AppContextProvider";
 import { toast } from "react-toastify";
 import axios from "axios";
 const MyProfile = () => {
