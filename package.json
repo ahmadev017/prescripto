@@ -11,6 +11,8 @@
     "start": "npm run dev"
   },
   "dependencies": {
+    "@stripe/react-stripe-js": "^3.7.0",
+    "@stripe/stripe-js": "^7.3.1",
     "@tailwindcss/vite": "^4.0.7",
     "axios": "^1.7.9",
     "react": "^19.0.0",

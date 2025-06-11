@@ -1,91 +1,110 @@
-import React, { useContext, useEffect } from 'react'
-import { useState } from 'react'
-import { AppContext } from '../context/AppContext'
-import axios from 'axios' 
-import { toast } from 'react-toastify'
-import { useNavigate } from 'react-router-dom'
-
-
-
-
+import React, { useContext, useEffect, useState } from 'react';
+import { AppContext } from '../context/AppContext';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
+  const { backendUrl, token, setToken } = useContext(AppContext);
+  const navigate = useNavigate();
 
+  const [isSignUp, setIsSignUp] = useState(true);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
 
-const {backendUrl, token, setToken} = useContext(AppContext)
-const navigate = useNavigate()
+  const onSubmitHandler = async (event) => {
+    event.preventDefault();
 
-const [state,setState]=useState('sign Up')
-const [email, setEmail] =useState('')
-const [password, setPassword] =useState('')
-const [name, setName] =useState('')
+    try {
+      const endpoint = isSignUp ? '/api/user/register' : '/api/user/login';
+      const payload = isSignUp ? { name, email, password } : { email, password };
 
+      const { data } = await axios.post(`${backendUrl}${endpoint}`, payload);
 
-
-
-
-const onSubmitHandler=async(event) =>{
-  event.preventDefault()
-  try{
-    if(state === 'sign Up') {
-      
-      const {data} = await axios.post(backendUrl + '/api/user/register',{name,password,email})
-      if(data.success){
-        localStorage.setItem('token',data.token)
-        setToken(data.token)
-      }else{
-        toast.error(data.message)
+      if (data.success) {
+        localStorage.setItem('token', data.token);
+        setToken(data.token);
+        toast.success(data.message || (isSignUp ? 'Registered successfully!' : 'Logged in successfully!'));
+        navigate('/'); // move here to avoid redirect from just context change
+      } else {
+        toast.error(data.message);
       }
-
-
-    }else{
-            const {data} = await axios.post(backendUrl + '/api/user/login',{password,email})
-      if(data.success){
-        localStorage.setItem('token',data.token)
-        setToken(data.token)
-      }else{
-        toast.error(data.message)
-      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message);
     }
-  }catch(error){
-     toast.error(error.message)
-  }
-}
+  };
+
+  //useEffect(() => {
+   // if (token) {
+    //  navigate('/');
+    //}
+ //}, [token, navigate]);
+
+  return (
+    <form onSubmit={onSubmitHandler}>
+      <div className='flex flex-col gap-3 m-auto mt-30 items-start p-8 w-[340px] sm:w-96 rounded-xl text-zinc-600 text-sm shadow-lg'>
+        <p className='text-2xl font-semibold'>{isSignUp ? 'Create Account' : 'Login'}</p>
+        <p>Please {isSignUp ? 'sign up' : 'log in'} to book an appointment</p>
 
 
-useEffect(()=>{
-  if(token){
-     navigate('/')
-  }
-},[token])
+        {isSignUp && (
+          <div className='w-full'>
+            <label htmlFor="name">Full Name</label>
+            <input
+              id="name"
+              className='border border-zinc-300 rounded w-full p-2 mt-1'
+              type="text"
+              onChange={(e) => setName(e.target.value)}
+              value={name}
+              required
+            />
+          </div>
+        )}
 
+        <div className='w-full'>
+          <label htmlFor="email">Email</label>
+          <input
+            id="email"
+            className='border border-zinc-300 rounded w-full p-2 mt-1'
+            type="email"
+            onChange={(e) => setEmail(e.target.value)}
+            value={email}
+            required
+          />
+        </div>
 
+        <div className='w-full'>
+          <label htmlFor="password">Password</label>
+          <input
+            id="password"
+            className='border border-zinc-300 rounded w-full p-2 mt-1'
+            type="password"
+            onChange={(e) => setPassword(e.target.value)}
+            value={password}
+            required
+          />
+        </div>
 
-return(
-<form onSubmit={onSubmitHandler}>
-  <div className='flex flex-col gap-3 m-auto mt-30 items-start p-8 w-[340px] sm:w-96  rounded-xl text-zinc-600 text-sm shadow-lg'>
-    <p className='text-2xl font-semibold'>{state==='sign Up'?"Create Acount":'Login'}</p>
-    <p>Please {state==='sign Up'?"sign up":'log in'} to book appointment</p>
-    {state==='sign Up'&&    <div className='w-full'>
-      <p>Full Name</p>
-      <input className='border border-zinc-300 rounded w-full p-2 mt-1 ' type="text" onChange={(e)=>setName(e.target.value)} value={name} required/>
-    </div>}
+        <button type='submit' className='bg-blue-500 text-white w-full py-2 rounded-md text-base cursor-pointer'>
+          {isSignUp ? 'Create Account' : 'Login'}
+        </button>
 
-    <div className='w-full'>
-      <p>Email</p>
-      <input className='border border-zinc-300 rounded w-full p-2 mt-1 'type="email" onChange={(e)=>setEmail(e.target.value)} value={email} required/>
-    </div>
-    <div className='w-full'>
-      <p>Password</p>
-      <input className='border border-zinc-300 rounded w-full p-2 mt-1 ' type="password" onChange={(e)=>setPassword(e.target.value)} value={password} required/>
-    </div>
-    <button type='submit' className='bg-blue-500 text-white w-full py-2 rounded-md text-base cursor-pointer'>{state==='sign Up'?"Create Acount":'Login'}</button>
-   
-    {state==='sign Up'?<p>Already have an account? <span onClick={()=>setState('Login')} className='text-blue-500 underline cursor-pointer'>Login here</span></p>:<p>Create a new account?<span onClick={()=>setState('sign Up')} className='text-blue-500 underline cursor-pointer'> click here</span></p>}
+        <p>
+          {isSignUp
+            ? 'Already have an account? '
+            : 'Create a new account? '}
+          <span
+            onClick={() => setIsSignUp(!isSignUp)}
+            className='text-blue-500 underline cursor-pointer'
+          >
+            {isSignUp ? 'Login here' : 'Click here'}
+          </span>
+        </p>
+      </div>
+    </form>
+  );
+};
 
-  </div>
-</form>
-  )
-}
+export default Login;
 
-export default Login

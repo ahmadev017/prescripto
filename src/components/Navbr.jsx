@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState , useRef, useEffect} from 'react'
 import {assets} from '../assets/assets'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { AppContext } from '../context/AppContext'
@@ -8,7 +8,23 @@ const {token,setToken,userData}=useContext(AppContext)
 
   const navigate= useNavigate();
 const [showMenu, setShowMenu]=useState(false)
+const [showDropdown, setShowDropdown] = useState(false);
+const dropdownRef = useRef(null);
 
+
+useEffect(() => {
+  function handleClickOutside(event) {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setShowDropdown(false);
+    }
+  }
+
+  document.addEventListener('mousedown', handleClickOutside);
+
+  return () => {
+    document.removeEventListener('mousedown', handleClickOutside);
+  };
+}, []);
 
 const logOut =()=>{
   setToken(false)
@@ -44,18 +60,25 @@ const logOut =()=>{
         {
           token && userData
           ?
-          <div className='flex items-center gap-2 cursor-pointer group relative'>
-            <img className='w-8 rounded-full' src={userData.image}
-            />
-            <img className='w-2.5' src={assets.dropdown_icon} alt="" />
-            <div className='absolute top-0 right-0 pt-14 text-base font-medium text-gray-600 z-20 hidden group-hover:block'>
-              <div className='min-w-48 bg-stone-100 rounded flex-col gap-4 p-4'>
-                <p onClick={()=>navigate('/my-profile')} className='hover:text-black cursor-pointer'>My Profile</p>
-                <p onClick={()=>navigate('/my-appointments')} className='hover:text-black cursor-pointer'>My Appointments</p>
-                <p onClick={logOut} className='hover:text-black cursor-pointer'>Logout</p>
-              </div>
-            </div>
-          </div>
+          <div
+          ref={dropdownRef}
+  className='flex items-center gap-2 cursor-pointer relative'
+  onClick={() => setShowDropdown((prev) => !prev)}
+>
+  <img className='w-8 rounded-full' src={userData.image} alt="User avatar" />
+  <img className='w-2.5' src={assets.dropdown_icon} alt="Dropdown icon" />
+
+  {showDropdown && (
+    <div className='absolute top-full right-0 mt-2 text-base font-medium text-gray-600 z-20'>
+      <div className='min-w-48 bg-stone-100 rounded flex-col gap-4 p-4'>
+        <p onClick={() => navigate('/my-profile')} className='hover:text-black cursor-pointer'>My Profile</p>
+        <p onClick={() => navigate('/my-appointments')} className='hover:text-black cursor-pointer'>My Appointments</p>
+        <p onClick={logOut} className='hover:text-black cursor-pointer'>Logout</p>
+      </div>
+    </div>
+  )}
+</div>
+
           :
           <button onClick={()=>navigate('/login')} className='bg-blue-500 text-white px-2 py-3 sm:px-8 rounded-full font-light  md:block text-wrap cursor-pointer'>Create account</button>
         }
