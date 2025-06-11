@@ -91,7 +91,7 @@ const MyProfile = () => {
             <p className="font-medium">Phone:</p>
             {isEdit ? (
               <input
-                className="bg-gray-100 max-w-52"
+                className="bg-gray-100 max-w-52 px-1 py-0.5"
                 type="text"
                 value={userData.phone}
                 onChange={(e) =>
@@ -105,7 +105,7 @@ const MyProfile = () => {
             {isEdit ? (
               <p>
                 <input
-                  className="bg-gray-50"
+                  className="bg-gray-50 py-0.5 px-1 mb-2"
                   onChange={(e) =>
                     setUserData((prev) => ({
                       ...prev,
@@ -116,8 +116,9 @@ const MyProfile = () => {
                   type="text"
                 />
                 <br />
+                
                 <input
-                  className="bg-gray-50"
+                  className="bg-gray-50 px-1 py-0.5"
                   onChange={(e) =>
                     setUserData((prev) => ({
                       ...prev,
