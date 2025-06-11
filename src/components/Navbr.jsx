@@ -32,12 +32,16 @@ const Navbr = () => {
 
   return (
     <div className="flex items-center justify-between text-sm py-4 mb-5 border-b border-b-gray-400">
-      <img
+      <div className="flex gap-4">
+        <img
         onClick={() => navigate("/")}
         className="w-44 cursor-pointer"
         src={assets.logo}
         alt=""
       />
+      <a className="px-4 border mr-8 hidden sm:block font-medium hover:bg-blue-500 hover:text-white ml-0 border-blue-500 text-blue-500 py-2 rounded-full "  target="_blank" href="https://prescripto-admin-new.vercel.app/">Admin</a>
+      </div>
+      
       <ul className="hidden md:flex items-start gap-5 font-medium">
         <NavLink to="/">
           <li className="py-1">HOME</li>
